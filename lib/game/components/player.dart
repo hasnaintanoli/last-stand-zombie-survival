@@ -38,6 +38,7 @@ class Player extends PositionComponent with HasGameReference<ZombieGame> {
 
   double _hitFlashTimer = 0.0;
   double _walkAnimTimer = 0.0;
+  double _footstepTimer = 0.0;
 
   Player({required Vector2 position})
       : super(
@@ -178,15 +179,22 @@ class Player extends PositionComponent with HasGameReference<ZombieGame> {
     if (damageBoostTimer > 0) damageBoostTimer -= dt;
     if (_hitFlashTimer > 0) _hitFlashTimer -= dt;
 
-    // Movement
-    if (moveDirection.length > 0) {
+    // Movement & Footsteps
+    if (moveDirection.length > 0.05) {
       _walkAnimTimer += dt * 10.0;
       final moveVelocity = moveDirection * speed * dt;
       position += moveVelocity;
 
+      // Footstep sound cadence based on walking speed
+      _footstepTimer -= dt;
+      if (_footstepTimer <= 0) {
+        final cadence = (0.42 * (190.0 / speed)).clamp(0.24, 0.48);
+        _footstepTimer = cadence;
+        game.audio.playFootstep();
+      }
+
       // Move freely in infinite open world
       // (Boundary clamping removed for infinite open world)
-
 
       // Obstacle collision response
       for (final obstacle in game.obstacles) {
@@ -195,6 +203,8 @@ class Player extends PositionComponent with HasGameReference<ZombieGame> {
           position += pushDir * (speed * dt * 1.2);
         }
       }
+    } else {
+      _footstepTimer = 0.08;
     }
   }
 

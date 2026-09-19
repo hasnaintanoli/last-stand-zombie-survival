@@ -53,14 +53,18 @@ class AudioService {
     _playSound('gameover.wav');
   }
 
-  void _playSound(String file, {String? fallback}) {
+  void playFootstep({double volume = 0.6}) {
+    _playSound('Slow_footsteps.wav', volume: volume);
+  }
+
+  void _playSound(String file, {String? fallback, double volume = 1.0}) {
     if (!LocalStorage.getSoundEnabled()) return;
     try {
-      FlameAudio.play(file);
+      FlameAudio.play(file, volume: volume);
     } catch (_) {
       if (fallback != null) {
         try {
-          FlameAudio.play(fallback);
+          FlameAudio.play(fallback, volume: volume);
         } catch (_) {}
       }
     }
