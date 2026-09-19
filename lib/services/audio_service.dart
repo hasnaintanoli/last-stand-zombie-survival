@@ -14,19 +14,19 @@ class AudioService {
   }
 
   void playPistolShoot() {
-    _playSound('pistol_shoot.wav', fallback: 'shoot.wav');
+    _playSound('pistol_shot.wav', fallback: 'pistol_shoot.wav');
   }
 
   void playShotgunShoot() {
-    _playSound('shotgun_shoot.wav', fallback: 'shoot.wav');
+    _playSound('shotgun_shot.wav', fallback: 'shotgun_shoot.wav');
   }
 
   void playRifleShoot() {
-    _playSound('rifle_shoot.wav', fallback: 'shoot.wav');
+    _playSound('rifle_shot.wav', fallback: 'rifle_shoot.wav');
   }
 
   void playShoot() {
-    _playSound('shoot.wav');
+    _playSound('pistol_shot.wav', fallback: 'shoot.wav');
   }
 
   void playReload() {
@@ -67,11 +67,17 @@ class AudioService {
       if (_footstepPlayer != null) {
         await _footstepPlayer!.resume();
       } else {
-        _footstepPlayer = await FlameAudio.loop('Slow_footsteps.wav', volume: volume);
+        _footstepPlayer = await FlameAudio.loop(
+          'Slow_footsteps.wav',
+          volume: volume,
+        );
       }
     } catch (_) {
       try {
-        _footstepPlayer = await FlameAudio.loopLongAudio('Slow_footsteps.wav', volume: volume);
+        _footstepPlayer = await FlameAudio.loopLongAudio(
+          'Slow_footsteps.wav',
+          volume: volume,
+        );
       } catch (_) {
         _isFootstepPlaying = false;
       }
@@ -109,7 +115,6 @@ class AudioService {
       } catch (_) {}
     }
   }
-
 
   void stopBgm() {
     try {
