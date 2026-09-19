@@ -2,16 +2,9 @@ import 'package:flame_audio/flame_audio.dart';
 import 'local_storage.dart';
 
 class AudioService {
-  bool _initialized = false;
-
-  Future<void> init() async {
-    try {
-      FlameAudio.bgm.initialize();
-      _initialized = true;
-    } catch (_) {
-      _initialized = false;
-    }
-  }
+  static final AudioService instance = AudioService._internal();
+  factory AudioService() => instance;
+  AudioService._internal();
 
   void playPistolShoot() {
     _playSound('pistol_shot.wav', fallback: 'pistol_shoot.wav');
@@ -55,41 +48,91 @@ class AudioService {
 
   AudioPlayer? _footstepPlayer;
   bool _isFootstepPlaying = false;
+  bool _footstepDesired = false;
+  bool _isFootstepLoading = false;
 
   void startFootstep({double volume = 0.55}) {
-    if (!LocalStorage.getSoundEnabled() || _isFootstepPlaying) return;
+    if (!LocalStorage.getSoundEnabled()) {
+      stopFootstep();
+      return;
+    }
+    if (_isFootstepPlaying || _isFootstepLoading) return;
+    _footstepDesired = true;
     _isFootstepPlaying = true;
     _startFootstepAsync(volume);
   }
 
   Future<void> _startFootstepAsync(double volume) async {
+    if (!_footstepDesired || !LocalStorage.getSoundEnabled()) {
+      _isFootstepPlaying = false;
+      return;
+    }
+    _isFootstepLoading = true;
     try {
       if (_footstepPlayer != null) {
-        await _footstepPlayer!.resume();
+        if (_footstepDesired && LocalStorage.getSoundEnabled()) {
+          await _footstepPlayer!.resume();
+        } else {
+          await _footstepPlayer!.pause();
+          await _footstepPlayer!.stop();
+        }
+        _isFootstepLoading = false;
+        return;
+      }
+
+      final player = await FlameAudio.loop(
+        'Slow_footsteps.wav',
+        volume: volume,
+      );
+      if (!_footstepDesired || !LocalStorage.getSoundEnabled()) {
+        try {
+          await player.pause();
+          await player.stop();
+          await player.dispose();
+        } catch (_) {}
+        _footstepPlayer = null;
+        _isFootstepPlaying = false;
       } else {
-        _footstepPlayer = await FlameAudio.loop(
-          'Slow_footsteps.wav',
-          volume: volume,
-        );
+        _footstepPlayer = player;
       }
     } catch (_) {
       try {
-        _footstepPlayer = await FlameAudio.loopLongAudio(
+        final player = await FlameAudio.loopLongAudio(
           'Slow_footsteps.wav',
           volume: volume,
         );
+        if (!_footstepDesired || !LocalStorage.getSoundEnabled()) {
+          try {
+            await player.pause();
+            await player.stop();
+            await player.dispose();
+          } catch (_) {}
+          _footstepPlayer = null;
+          _isFootstepPlaying = false;
+        } else {
+          _footstepPlayer = player;
+        }
       } catch (_) {
         _isFootstepPlaying = false;
+      }
+    } finally {
+      _isFootstepLoading = false;
+      if (!_footstepDesired || !LocalStorage.getSoundEnabled()) {
+        stopFootstep();
       }
     }
   }
 
   void stopFootstep() {
-    if (!_isFootstepPlaying && _footstepPlayer == null) return;
+    _footstepDesired = false;
     _isFootstepPlaying = false;
+    _isFootstepLoading = false;
     try {
       _footstepPlayer?.pause();
+      _footstepPlayer?.stop();
+      _footstepPlayer?.dispose();
     } catch (_) {}
+    _footstepPlayer = null;
   }
 
   void _playSound(String file, {String? fallback, double volume = 1.0}) {
@@ -105,19 +148,97 @@ class AudioService {
     }
   }
 
+  AudioPlayer? _bgmPlayer;
+  bool _bgmDesired = false;
+  bool _isBgmLoading = false;
+
   void startBgm() {
-    if (!LocalStorage.getMusicEnabled() || !_initialized) return;
+    if (!LocalStorage.getMusicEnabled()) {
+      stopBgm();
+      return;
+    }
+    _bgmDesired = true;
+    if (_isBgmLoading) return;
+    _startBgmAsync();
+  }
+
+  Future<void> _startBgmAsync() async {
+    if (!_bgmDesired || !LocalStorage.getMusicEnabled()) {
+      return;
+    }
+    _isBgmLoading = true;
     try {
-      FlameAudio.bgm.play('bgm.mp3', volume: 0.45);
+      if (_bgmPlayer != null) {
+        if (_bgmDesired && LocalStorage.getMusicEnabled()) {
+          await _bgmPlayer!.resume();
+        } else {
+          await _bgmPlayer!.pause();
+          await _bgmPlayer!.stop();
+          await _bgmPlayer!.dispose();
+          _bgmPlayer = null;
+        }
+        _isBgmLoading = false;
+        return;
+      }
+
+      final player = await FlameAudio.loopLongAudio('bgm.wav', volume: 0.45);
+      if (!_bgmDesired || !LocalStorage.getMusicEnabled()) {
+        try {
+          await player.pause();
+          await player.stop();
+          await player.dispose();
+        } catch (_) {}
+        _bgmPlayer = null;
+      } else {
+        _bgmPlayer = player;
+      }
     } catch (_) {
       try {
-        FlameAudio.bgm.play('bgm.wav', volume: 0.45);
-      } catch (_) {}
+        FlameAudio.bgm.initialize();
+        if (_bgmDesired && LocalStorage.getMusicEnabled()) {
+          FlameAudio.bgm.play('bgm.wav', volume: 0.45);
+        } else {
+          FlameAudio.bgm.stop();
+        }
+      } catch (_) {
+        try {
+          if (_bgmDesired && LocalStorage.getMusicEnabled()) {
+            final fallbackPlayer = await FlameAudio.loop(
+              'bgm.wav',
+              volume: 0.45,
+            );
+            if (!_bgmDesired || !LocalStorage.getMusicEnabled()) {
+              try {
+                await fallbackPlayer.pause();
+                await fallbackPlayer.stop();
+                await fallbackPlayer.dispose();
+              } catch (_) {}
+              _bgmPlayer = null;
+            } else {
+              _bgmPlayer = fallbackPlayer;
+            }
+          }
+        } catch (_) {}
+      }
+    } finally {
+      _isBgmLoading = false;
+      if (!_bgmDesired || !LocalStorage.getMusicEnabled()) {
+        stopBgm();
+      }
     }
   }
 
   void stopBgm() {
+    _bgmDesired = false;
+    _isBgmLoading = false;
     try {
+      _bgmPlayer?.pause();
+      _bgmPlayer?.stop();
+      _bgmPlayer?.dispose();
+    } catch (_) {}
+    _bgmPlayer = null;
+    try {
+      FlameAudio.bgm.pause();
       FlameAudio.bgm.stop();
     } catch (_) {}
   }

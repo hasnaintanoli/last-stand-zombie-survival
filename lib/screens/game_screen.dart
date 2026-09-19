@@ -21,6 +21,7 @@ class GameScreen extends StatefulWidget {
 
 class _GameScreenState extends State<GameScreen> {
   late ZombieGame _game;
+  late final Stream<int> _hudStream;
 
   // Joystick touch state
   Offset? _joystickCenter;
@@ -30,6 +31,14 @@ class _GameScreenState extends State<GameScreen> {
   void initState() {
     super.initState();
     _game = ZombieGame();
+    _hudStream = Stream.periodic(const Duration(milliseconds: 33), (i) => i).asBroadcastStream();
+  }
+
+  @override
+  void dispose() {
+    _game.audio.stopFootstep();
+    _game.saveStats();
+    super.dispose();
   }
 
   @override
@@ -48,15 +57,9 @@ class _GameScreenState extends State<GameScreen> {
             },
           ),
 
-          // Realtime Flutter Material 3 HUD Overlay
-          AnimatedBuilder(
-            animation: Listenable.merge([]), // Built-in tick updates via StreamBuilder or ticker
-            builder: (context, _) => _buildHudOverlay(),
-          ),
-
-          // Stream/Ticker updater for smooth 60 FPS HUD state refresh
+          // Realtime 60 FPS HUD State Refresh Overlay
           StreamBuilder<int>(
-            stream: Stream.periodic(const Duration(milliseconds: 33), (i) => i),
+            stream: _hudStream,
             builder: (context, snapshot) {
               return _buildHudOverlay();
             },

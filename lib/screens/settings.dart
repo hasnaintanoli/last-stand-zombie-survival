@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../services/audio_service.dart';
 import '../services/local_storage.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -64,6 +65,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       setState(() {
                         soundEnabled = val;
                         LocalStorage.setSoundEnabled(val);
+                        if (!val) {
+                          AudioService().stopFootstep();
+                        }
                       });
                     },
                   ),
@@ -87,6 +91,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       setState(() {
                         musicEnabled = val;
                         LocalStorage.setMusicEnabled(val);
+                        if (musicEnabled) {
+                          AudioService().startBgm();
+                        } else {
+                          AudioService().stopBgm();
+                        }
                       });
                     },
                   ),

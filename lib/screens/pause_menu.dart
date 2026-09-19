@@ -61,6 +61,9 @@ class _PauseMenuDialogState extends State<PauseMenuDialog> {
                   setState(() {
                     soundEnabled = val;
                     LocalStorage.setSoundEnabled(val);
+                    if (!val) {
+                      widget.game.audio.stopFootstep();
+                    }
                   });
                 },
               ),
@@ -76,6 +79,11 @@ class _PauseMenuDialogState extends State<PauseMenuDialog> {
                   setState(() {
                     musicEnabled = val;
                     LocalStorage.setMusicEnabled(val);
+                    if (val) {
+                      widget.game.audio.startBgm();
+                    } else {
+                      widget.game.audio.stopBgm();
+                    }
                   });
                 },
               ),

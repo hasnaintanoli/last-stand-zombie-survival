@@ -69,7 +69,7 @@ Designed for **Android Mobile & Tablet** with full support for **Windows Desktop
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/HasnainAli/last-stand-zombie-survival.git
+   git clone https://github.com/hasnaintanoli/last-stand-zombie-survival.git
    cd last-stand-zombie-survival
    ```
 

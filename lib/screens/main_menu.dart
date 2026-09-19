@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../services/audio_service.dart';
 import '../services/local_storage.dart';
 import 'game_screen.dart';
 import 'how_to_play.dart';
@@ -17,6 +18,8 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
   int highestWave = 1;
   int totalKills = 0;
   int coins = 0;
+  bool musicEnabled = LocalStorage.getMusicEnabled();
+  bool soundEnabled = LocalStorage.getSoundEnabled();
 
   @override
   void initState() {
@@ -30,7 +33,14 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
       highestWave = LocalStorage.getHighestWave();
       totalKills = LocalStorage.getTotalKills();
       coins = LocalStorage.getCoins();
+      musicEnabled = LocalStorage.getMusicEnabled();
+      soundEnabled = LocalStorage.getSoundEnabled();
     });
+    if (musicEnabled) {
+      AudioService().startBgm();
+    } else {
+      AudioService().stopBgm();
+    }
   }
 
   @override
@@ -51,6 +61,52 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
                     Color(0xFF0F1115),
                   ],
                 ),
+              ),
+            ),
+          ),
+
+          // Top-Right Quick Audio & Music Controls
+          Positioned(
+            top: 16,
+            right: 16,
+            child: SafeArea(
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Sound FX Toggle
+                  _quickAudioButton(
+                    icon: soundEnabled ? Icons.volume_up_rounded : Icons.volume_off_rounded,
+                    color: soundEnabled ? Colors.amber : Colors.grey.shade600,
+                    tooltip: soundEnabled ? 'Sound FX: ON' : 'Sound FX: OFF',
+                    onTap: () {
+                      setState(() {
+                        soundEnabled = !soundEnabled;
+                        LocalStorage.setSoundEnabled(soundEnabled);
+                        if (!soundEnabled) {
+                          AudioService().stopFootstep();
+                        }
+                      });
+                    },
+                  ),
+                  const SizedBox(width: 10),
+                  // Music Toggle
+                  _quickAudioButton(
+                    icon: musicEnabled ? Icons.music_note_rounded : Icons.music_off_rounded,
+                    color: musicEnabled ? Colors.purpleAccent : Colors.grey.shade600,
+                    tooltip: musicEnabled ? 'Music: ON' : 'Music: OFF',
+                    onTap: () {
+                      setState(() {
+                        musicEnabled = !musicEnabled;
+                        LocalStorage.setMusicEnabled(musicEnabled);
+                        if (musicEnabled) {
+                          AudioService().startBgm();
+                        } else {
+                          AudioService().stopBgm();
+                        }
+                      });
+                    },
+                  ),
+                ],
               ),
             ),
           ),
@@ -244,6 +300,40 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
           elevation: 6,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _quickAudioButton({
+    required IconData icon,
+    required Color color,
+    required String tooltip,
+    required VoidCallback onTap,
+  }) {
+    return Material(
+      color: Colors.transparent,
+      child: Tooltip(
+        message: tooltip,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: const Color(0xFF1E222A).withValues(alpha: 0.92),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: const Color(0xFF333842), width: 1.5),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.4),
+                  blurRadius: 8,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+            ),
+            child: Icon(icon, color: color, size: 24),
           ),
         ),
       ),
