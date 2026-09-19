@@ -53,8 +53,37 @@ class AudioService {
     _playSound('gameover.wav');
   }
 
-  void playFootstep({double volume = 0.6}) {
-    _playSound('Slow_footsteps.wav', volume: volume);
+  AudioPlayer? _footstepPlayer;
+  bool _isFootstepPlaying = false;
+
+  void startFootstep({double volume = 0.55}) {
+    if (!LocalStorage.getSoundEnabled() || _isFootstepPlaying) return;
+    _isFootstepPlaying = true;
+    _startFootstepAsync(volume);
+  }
+
+  Future<void> _startFootstepAsync(double volume) async {
+    try {
+      if (_footstepPlayer != null) {
+        await _footstepPlayer!.resume();
+      } else {
+        _footstepPlayer = await FlameAudio.loop('Slow_footsteps.wav', volume: volume);
+      }
+    } catch (_) {
+      try {
+        _footstepPlayer = await FlameAudio.loopLongAudio('Slow_footsteps.wav', volume: volume);
+      } catch (_) {
+        _isFootstepPlaying = false;
+      }
+    }
+  }
+
+  void stopFootstep() {
+    if (!_isFootstepPlaying && _footstepPlayer == null) return;
+    _isFootstepPlaying = false;
+    try {
+      _footstepPlayer?.pause();
+    } catch (_) {}
   }
 
   void _playSound(String file, {String? fallback, double volume = 1.0}) {

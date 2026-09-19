@@ -312,6 +312,7 @@ class ZombieGame extends FlameGame
   }
 
   void onLevelUp() {
+    audio.stopFootstep();
     audio.playLevelUp();
     pendingUpgrades = XpSystem.getRandomUpgrades();
     overlays.add('LevelUpOverlay');
@@ -334,6 +335,7 @@ class ZombieGame extends FlameGame
   }
 
   void onPlayerDeath() {
+    audio.stopFootstep();
     audio.stopBgm();
     audio.playGameOver();
     saveStats();
@@ -349,6 +351,7 @@ class ZombieGame extends FlameGame
   }
 
   void resetGame() {
+    audio.stopFootstep();
     _generatedChunks.clear();
     zombies.clear();
     obstacles.clear();

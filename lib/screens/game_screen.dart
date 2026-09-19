@@ -101,6 +101,7 @@ class _GameScreenState extends State<GameScreen> {
                       icon: const Icon(Icons.pause_circle_filled_rounded,
                           color: Colors.white, size: 36),
                       onPressed: () {
+                        _game.audio.stopFootstep();
                         _game.overlays.add('PauseOverlay');
                         _game.pauseEngine();
                       },

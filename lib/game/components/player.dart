@@ -38,7 +38,6 @@ class Player extends PositionComponent with HasGameReference<ZombieGame> {
 
   double _hitFlashTimer = 0.0;
   double _walkAnimTimer = 0.0;
-  double _footstepTimer = 0.0;
 
   Player({required Vector2 position})
       : super(
@@ -138,8 +137,15 @@ class Player extends PositionComponent with HasGameReference<ZombieGame> {
 
     if (health <= 0) {
       health = 0;
+      game.audio.stopFootstep();
       game.onPlayerDeath();
     }
+  }
+
+  @override
+  void onRemove() {
+    game.audio.stopFootstep();
+    super.onRemove();
   }
 
   void heal(double amount) {
@@ -172,7 +178,10 @@ class Player extends PositionComponent with HasGameReference<ZombieGame> {
   @override
   void update(double dt) {
     super.update(dt);
-    if (!isAlive) return;
+    if (!isAlive) {
+      game.audio.stopFootstep();
+      return;
+    }
 
     // Timers
     currentWeapon.update(dt);
@@ -185,16 +194,8 @@ class Player extends PositionComponent with HasGameReference<ZombieGame> {
       final moveVelocity = moveDirection * speed * dt;
       position += moveVelocity;
 
-      // Footstep sound cadence based on walking speed
-      _footstepTimer -= dt;
-      if (_footstepTimer <= 0) {
-        final cadence = (0.42 * (190.0 / speed)).clamp(0.24, 0.48);
-        _footstepTimer = cadence;
-        game.audio.playFootstep();
-      }
-
-      // Move freely in infinite open world
-      // (Boundary clamping removed for infinite open world)
+      // Start looping footstep sound when moving
+      game.audio.startFootstep();
 
       // Obstacle collision response
       for (final obstacle in game.obstacles) {
@@ -204,7 +205,8 @@ class Player extends PositionComponent with HasGameReference<ZombieGame> {
         }
       }
     } else {
-      _footstepTimer = 0.08;
+      // Immediately stop footstep sound when stopped
+      game.audio.stopFootstep();
     }
   }
 
