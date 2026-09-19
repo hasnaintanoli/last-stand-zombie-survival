@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="towd_game"
+        android:label="Last Stand: Zombie Survival"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

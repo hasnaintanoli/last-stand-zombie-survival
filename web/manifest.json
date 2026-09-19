@@ -1,11 +1,11 @@
 {
-    "name": "towd_game",
-    "short_name": "towd_game",
+    "name": "Last Stand: Zombie Survival",
+    "short_name": "Last Stand",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#111116",
+    "theme_color": "#FF2244",
+    "description": "A 2D Top-Down Zombie Survival Game built with Flutter and Flame engine.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

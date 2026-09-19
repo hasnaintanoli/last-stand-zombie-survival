@@ -1,4 +1,4 @@
-name: towd_game
+name: last_stand_zombie_survival
 description: "Last Stand - A 2D Top-Down Zombie Survival Game built with Flutter & Flame."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
