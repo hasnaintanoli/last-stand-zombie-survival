@@ -24,8 +24,7 @@ void main() {
     await tester.pumpWidget(const ZombieSurvivalApp());
     await tester.pump();
 
-    expect(find.text('LAST STAND'), findsOneWidget);
-    expect(find.text('SURVIVE THE NIGHT'), findsOneWidget);
+    expect(find.byType(Image), findsOneWidget);
     expect(find.text('PLAY GAME'), findsOneWidget);
     expect(find.text('HOW TO PLAY'), findsOneWidget);
     expect(find.text('SETTINGS'), findsOneWidget);

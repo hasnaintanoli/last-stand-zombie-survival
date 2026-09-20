@@ -75,7 +75,9 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
                 children: [
                   // Sound FX Toggle
                   _quickAudioButton(
-                    icon: soundEnabled ? Icons.volume_up_rounded : Icons.volume_off_rounded,
+                    icon: soundEnabled
+                        ? Icons.volume_up_rounded
+                        : Icons.volume_off_rounded,
                     color: soundEnabled ? Colors.amber : Colors.grey.shade600,
                     tooltip: soundEnabled ? 'Sound FX: ON' : 'Sound FX: OFF',
                     onTap: () {
@@ -91,8 +93,12 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
                   const SizedBox(width: 10),
                   // Music Toggle
                   _quickAudioButton(
-                    icon: musicEnabled ? Icons.music_note_rounded : Icons.music_off_rounded,
-                    color: musicEnabled ? Colors.purpleAccent : Colors.grey.shade600,
+                    icon: musicEnabled
+                        ? Icons.music_note_rounded
+                        : Icons.music_off_rounded,
+                    color: musicEnabled
+                        ? Colors.purpleAccent
+                        : Colors.grey.shade600,
                     tooltip: musicEnabled ? 'Music: ON' : 'Music: OFF',
                     onTap: () {
                       setState(() {
@@ -113,44 +119,21 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
 
           Center(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 32.0),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 24.0,
+                vertical: 32.0,
+              ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // Game Logo Header
-                  const Icon(
-                    Icons.warning_amber_rounded,
-                    size: 64,
-                    color: Color(0xFFE53935),
+                  // Game Logo Header Image
+                  Image.asset(
+                    'assets/images/logo.png',
+                    width: 380,
+                    height: 120,
+                    fit: BoxFit.contain,
                   ),
-                  const SizedBox(height: 12),
-
-                  Text(
-                    'LAST STAND',
-                    style: GoogleFonts.blackOpsOne(
-                      fontSize: 48,
-                      color: const Color(0xFFE53935),
-                      letterSpacing: 4.0,
-                      shadows: [
-                        const Shadow(
-                          color: Colors.black,
-                          blurRadius: 16,
-                          offset: Offset(2, 4),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  Text(
-                    'SURVIVE THE NIGHT',
-                    style: GoogleFonts.orbitron(
-                      fontSize: 16,
-                      color: Colors.grey.shade400,
-                      letterSpacing: 6.0,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 36),
+                  const SizedBox(height: 32),
 
                   // High Score / Stats Card
                   Container(
@@ -176,16 +159,36 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            _statItem('HIGH SCORE', highScore.toString(), Icons.emoji_events, Colors.amber),
-                            _statItem('BEST WAVE', 'WAVE $highestWave', Icons.shield, Colors.redAccent),
+                            _statItem(
+                              'HIGH SCORE',
+                              highScore.toString(),
+                              Icons.emoji_events,
+                              Colors.amber,
+                            ),
+                            _statItem(
+                              'BEST WAVE',
+                              'WAVE $highestWave',
+                              Icons.shield,
+                              Colors.redAccent,
+                            ),
                           ],
                         ),
                         const Divider(color: Color(0xFF333842), height: 24),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            _statItem('TOTAL KILLS', totalKills.toString(), Icons.dangerous, Colors.orangeAccent),
-                            _statItem('COINS', coins.toString(), Icons.monetization_on, Colors.yellow),
+                            _statItem(
+                              'TOTAL KILLS',
+                              totalKills.toString(),
+                              Icons.dangerous,
+                              Colors.orangeAccent,
+                            ),
+                            _statItem(
+                              'COINS',
+                              coins.toString(),
+                              Icons.monetization_on,
+                              Colors.yellow,
+                            ),
                           ],
                         ),
                       ],
@@ -216,7 +219,9 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (_) => const HowToPlayScreen()),
+                        MaterialPageRoute(
+                          builder: (_) => const HowToPlayScreen(),
+                        ),
                       );
                     },
                   ),
@@ -230,7 +235,9 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (_) => const SettingsScreen()),
+                        MaterialPageRoute(
+                          builder: (_) => const SettingsScreen(),
+                        ),
                       ).then((_) => _loadStats());
                     },
                   ),
